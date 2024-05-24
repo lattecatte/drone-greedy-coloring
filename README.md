@@ -35,8 +35,8 @@ non-linear decrease in the average number of conflicts per operation was observe
 to the “spreading effect” and the “reduction of relative velocity effect”. The values for the number of layers needed 
 were plotted in Figure 1(b).</br>
 ![image](https://github.com/lattecatte/DroneGreedyColoring/assets/154484150/315576bb-4485-406c-a3c3-5d263667c156)![image](https://github.com/lattecatte/DroneGreedyColoring/assets/154484150/064df05d-91f0-4fd4-a677-5e880d73b35f)</br>
-**Figure 1**, Left: (a) Average numbers of conflicts per operation as a function of n and R</br>
-Right: (b) Number of layers needed as a function of n and R</br>
+###### **Figure 1**, Left: (a) Average numbers of conflicts per operation as a function of n and R</br>
+###### Right: (b) Number of layers needed as a function of n and R</br>
 Data for average number of conflicts per operation in Figure 1(a) was plotted against data for the number of layers needed in Figure 1(b), as shown by Figure 3(a). By observing the differences between the different UTM architectures, a tradeoff between the average number of conflicts per operation and number of layers needed can be observed as the number of UTMSPs vary.</br>
 </br>
 *Applying the 1% cut-off point*</br>
