@@ -6,7 +6,7 @@ Multicopter collision simulation using the Greedy Coloring algorithm.
 # Introduction
 The objective of an unmanned traffic management (UTM) is to optimize the capacity of the high-density low-level 
 uncontrolled airspace. One such method for optimization is to assign different vertical layers of altitude for 
-unmanned aircraft systems (UAS) flight operations that are in conflict.
+unmanned aircraft systems (UAS) flight operations that are in conflict.</br>
 This study aims to analyze the deconfliction of unmanned aircraft traffic management at the high-density low-level 
 uncontrolled airspace by utilizing the vertical layer assignment method. This was done by modeling the airspace 
 and generating random UAS flight operations and applying the greedy coloring algorithm to resolve conflicts 
