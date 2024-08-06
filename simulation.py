@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 import time
 import sys
@@ -21,15 +19,9 @@ max_time = 10000
 max_range = 10000       # INDEPENDENT VARIBALE
 r = 150                 # INDEPENDENT VARIBALE
 v_max = 20              # INDEPENDENT VARIBALE
-
-#a_const = 2
-#dt_vmax = v_max / a_const
-#ds_vmax = 0.5 * a_const * dt_vmax**2
 safedist_horizontal = 30 * v_max
-
 v_ascent = 2
 safedist_vertical = 5 * v_ascent
-
 altitude_default = 4 #20
 altitude_levels = [140, 120, 100, 80, 60, 40]
 
@@ -43,7 +35,6 @@ class Drone:
         self.t0 = t0
         self.priority = priority
         self.number = number
-
         self.z = altitude_default
         self.z_top = self.z + safedist_vertical
         self.z_bottom = self.z - safedist_vertical
@@ -52,27 +43,20 @@ class Drone:
         self.overlap_count = 0
         self.overlap_friends = []
         
-        # calculations
-#        self.ds_takeoff = self.z
-#        self.ds_landing = self.z
+        # displace and time
         self.ds_takeoff = 0
         self.ds_landing = 0
         self.ds_horizontal = np.sqrt((self.x1 - self.x0)**2 + (self.y1 - self.y0)**2)
-#        self.ds_cruise = self.ds_horizontal - 2 * ds_vmax
         self.ds = self.ds_takeoff + self.ds_horizontal + self.ds_landing
-        
-        self.dt_takeoff = 0 #self.ds_takeoff / v_ascent
-        self.dt_landing = 0 #self.ds_landing / v_ascent
-#        self.dt_cruise = self.ds_cruise / v_max
-#        self.dt_horizontal = self.dt_cruise + 2 * dt_vmax
+        self.dt_takeoff = 0     # self.ds_takeoff / v_ascent
+        self.dt_landing = 0     # self.ds_landing / v_ascent
         self.dt_horizontal = self.ds_horizontal / v_max
         self.dt = self.dt_takeoff + self.dt_horizontal + self.dt_landing
-        
         self.t_takeoff_done = self.t0 + self.dt_takeoff
         self.t_landing_standby = self.t_takeoff_done + self.dt_horizontal
         self.t1 = self.t_landing_standby + self.dt_landing
         
-        ### PRE-FLIGHT VOLUME
+        # pre-flight volumes
         self.dx = self.x1 - self.x0
         self.dy = self.y1 - self.y0
         if self.dx != 0:
@@ -96,47 +80,39 @@ class Drone:
         self.xy0_bl = self.get_diag_points(self.x0,-1,-1, self.y0, 1,-1)
         self.xy0_br = self.get_diag_points(self.x0,-1, 1, self.y0,-1,-1)
         self.xy0_tl = self.get_diag_points(self.x0, 1,-1, self.y0, 1, 1)
-        self.xy0_tr = self.get_diag_points(self.x0, 1, 1, self.y0,-1, 1)
-        
+        self.xy0_tr = self.get_diag_points(self.x0, 1, 1, self.y0,-1, 1)       
         self.xy1_bl = self.get_diag_points(self.x1,-1,-1, self.y1, 1,-1)
         self.xy1_br = self.get_diag_points(self.x1,-1, 1, self.y1,-1,-1)
         self.xy1_tl = self.get_diag_points(self.x1, 1,-1, self.y1, 1, 1)
         self.xy1_tr = self.get_diag_points(self.x1, 1, 1, self.y1,-1, 1)
-
-        # self.vol_takeoff = Polygon([self.xy0_bl, self.xy0_br, self.xy0_tr, self.xy0_tl])
-        # self.vol_landing = Polygon([self.xy1_bl, self.xy1_br, self.xy1_tr, self.xy1_tl])
-        # self.vol_horizontal = Polygon([self.xy0_bl, self.xy0_br, self.xy1_tr, self.xy1_tl])
         
     def rel_dist(self, other, t):
         self.xnow = self.x0 + (v_max*np.cos(self.angle)) * (t - self.t0)
         self.ynow = self.y0 + (v_max*np.sin(self.angle)) * (t - self.t0)
         other.xnow = other.x0 + (v_max*np.cos(other.angle)) * (t - other.t0)
         other.ynow = other.y0 + (v_max*np.sin(other.angle)) * (t - other.t0)
-
         self.dr = np.sqrt((other.xnow - self.xnow)**2 + (other.ynow - self.ynow)**2)
-        
         return (self.xnow, other.xnow, self.dr)
       
-    def get_diag_points(self, x0, xcos, xsin, y0, ycos, ysin):                  # xcos refers to the coefficient of cos for x
+    def get_diag_points(self, x0, xcos, xsin, y0, ycos, ysin):  # xcos refers to the coefficient of cos for x
         x_diag = x0 + safedist_horizontal*(xcos*np.cos(self.angle) + xsin*np.sin(self.angle))
         y_diag = y0 + safedist_horizontal*(ycos*np.cos(self.angle) + ysin*np.sin(self.angle))
         return x_diag, y_diag
 
-    ### check xy intersection without calculating crit point
+    # check xy intersection without calculating crit point
     def ccwACD(self, other):
         return (other.y1-self.y0) * (other.x0-self.x0) > (other.y0-self.y0) * (other.x1-self.x0)
     
-    def ccwBCD(self,other):  
+    def ccwBCD(self, other):  
         return (other.y1-self.y1) * (other.x0-self.x1) > (other.y0-self.y1) * (other.x1-self.x1)
         
-    def ccwABC(self,other):
+    def ccwABC(self, other):
         return (other.y0-self.y0) * (self.x1-self.x0) > (self.y1-self.y0) * (other.x0-self.x0)
         
-    def ccwABD(self,other):
+    def ccwABD(self, other):
         return (other.y1-self.y0) * (self.x1-self.x0) > (self.y1-self.y0) * (other.x1-self.x0)
         
-    # Return true if line segments AB and CD intersect
-    def check_xy_intersect(self,other):
+    def check_xy_intersect(self, other):     #return true if line segments AB and CD intersect
         return self.ccwACD(other) != self.ccwBCD(other) and self.ccwABC(other) != self.ccwABD(other)
 
     def check_intersect(self, other):
@@ -151,13 +127,10 @@ class Drone:
     def get_intersect(self, other):
         self.x_crit = (self.b - other.b) / (other.grad - self.grad)
         other.x_crit = self.x_crit
-
         self.y_crit = self.grad * self.x_crit + self.b 
         other.y_crit = self.y_crit
-        
         self.t_crit = self.t0 + (self.x_crit - self.x0) / (v_max*np.cos(self.angle))
         other.t_crit = other.t0 + (other.x_crit - other.x0) / (v_max*np.cos(other.angle))
-        
         return (self.x_crit, self.y_crit, self.t_crit, other.t_crit)
 
 def activate_parameters():
@@ -169,9 +142,6 @@ def get_flight_info():
         print("Drone", n, "dt takeoff", drone_list[n].dt_takeoff, "dt hotizontal", drone_list[n].dt_horizontal, "dt", drone_list[n].dt)
         print("Drone", n, "ds takeoff", drone_list[n].ds_takeoff, "ds horizontal", drone_list[n].ds_horizontal, "ds", drone_list[n].ds)
     print("Sum dt", sum(drone.dt for drone in drone_list))
-        #    print("dt", drone_list[n].dt_horizontal, drone_list[n].ds_horizontal / v_max, drone_list[n].t)
-        #    print("t", drone_list[n].t0, drone_list[n].t_takeoff_done, drone_list[n].t_landing_standby, drone_list[n].t1)
-        #    print("angle", drone_list[n].angle)
 
 def print_lists():
     print("overlap list", len(overlap_list))
@@ -179,14 +149,13 @@ def print_lists():
 
 seconds = time.time()
 
-### ADDING DRONES
+# adding drones
 drone_list = []
-n_count = 1000           # INDEPENDENT VARIBALE
+n_count = 1000  # INDEPENDENT VARIBALE
 m = 10
 
-# RANDOMIZING POS AND TIME
-np.random.seed(133769)
-#drone_list.append(Drone(1000,1000,2000,2000, t0=0, priority=0))
+# randomizing position and time
+np.random.seed(133769)  # input random seed
 random_pos = np.random.randint(0, max_range, size=4*n_count)
 random_time = np.random.randint(0, max_time, size=n_count)
 
@@ -197,9 +166,10 @@ for n in range(n_count):
 drone_list = sorted(drone_list, key=operator.attrgetter('t0'))
 graph = np.zeros(shape=(n_count, n_count))
 
-# PRINT INFO AND SUBDIVIDE TO HEADING-BASED ARRAYS FOR DECENTRALIZED METHOD
+# print info and subdivide to heading-based arrays for decentralized method
 layer21_list, layer22_list, layer31_list, layer32_list, layer33_list = [], [], [], [], []
 layer41_list, layer42_list, layer43_list, layer44_list = [], [], [], []
+layer_list = [layer21_list, layer22_list, layer31_list, layer32_list, layer33_list, layer41_list, layer42_list, layer43_list, layer44_list]
 
 for n in range(n_count):    
     print(n, "POS", drone_list[n].x0, drone_list[n].y0, drone_list[n].x1, drone_list[n].y1, "m", drone_list[n].grad, "b", drone_list[n].b)
@@ -236,12 +206,12 @@ layer42_graph = np.zeros(shape=(len(layer42_list), len(layer42_list)))
 layer43_graph = np.zeros(shape=(len(layer43_list), len(layer43_list)))
 layer44_graph = np.zeros(shape=(len(layer44_list), len(layer44_list)))
 
-# COLOR LIST FOR 2D AND 3D PLOTS
+# color list for 2d and 3d plots
 x = np.arange(n)
 ys = [i+x+(i*x)**2 for i in range(n_count)]
 color_list = cm.rainbow(np.linspace(0, 1, len(ys)))
 
-# COMBINATIONS
+# combinations
 combinations = []
 for comb in itertools.combinations((list(range(len(drone_list)))), 2):
     combinations.append(comb)
@@ -279,30 +249,26 @@ for comb in itertools.combinations((list(range(len(layer44_list)))), 2):
 
 ### MAIN LOOP
 for i in range(len(combinations)):
-#    print("Drone", combinations[i][0], "against", combinations[i][1], drone_list[combinations[i][0]].check_intersect(drone_list[combinations[i][1]]))
-#    print(combinations[i][0])
+    # print("Drone", combinations[i][0], "against", combinations[i][1], drone_list[combinations[i][0]].check_intersect(drone_list[combinations[i][1]]))
+    # print(combinations[i][0])
     if drone_list[combinations[i][0]].check_intersect(drone_list[combinations[i][1]]) == True:
-        
         crit = drone_list[combinations[i][0]].get_intersect(drone_list[combinations[i][1]])
-#        print(combinations[i][0], combinations[i][1], "crit", crit)
-        
+        # print(combinations[i][0], combinations[i][1], "crit", crit)
         drone_list[combinations[i][0]].t_min = min(drone_list[combinations[i][0]].t_crit, drone_list[combinations[i][0]].t_crit)
         drone_list[combinations[i][0]].t_max = max(drone_list[combinations[i][0]].t_crit, drone_list[combinations[i][0]].t_crit)
           
-#        for t in range(int(drone_list[combinations[i][0]].t0), int(drone_list[combinations[i][0]].t1), 10):
+        # for t in range(int(drone_list[combinations[i][0]].t0), int(drone_list[combinations[i][0]].t1), 10):
         prev_rel = 100000000
         for t in range(int(drone_list[combinations[i][0]].t_min - 60), int(drone_list[combinations[i][0]].t_max + 60), 1):
-
             rel = drone_list[combinations[i][0]].rel_dist(drone_list[combinations[i][1]], t)
-#            print(combinations[i][0], combinations[i][1], "rel", rel)
-            
+            # print(combinations[i][0], combinations[i][1], "rel", rel)
             if rel[2] > prev_rel:
                 break
             prev_rel = rel[2]
             
             if rel[2] <= r:
                 time_delay = r - rel[2]
-#                print("overlap detected")
+                # print("overlap detected")
                 graph[combinations[i][0]][combinations[i][1]] = 1
                 graph[combinations[i][1]][combinations[i][0]] = 1
                 drone_list[combinations[i][0]].overlap_count += 1
@@ -310,28 +276,24 @@ for i in range(len(combinations)):
                 drone_list[combinations[i][0]].overlap_friends.append(combinations[i][1])
                 drone_list[combinations[i][1]].overlap_friends.append(combinations[i][0])
                 break
-#            else:
-#                drone_list[combinations[i][0]].overlap_count = 0
-#                drone_list[combinations[i][1]].overlap_count = 0
-#                drone_list[combinations[i][0]].overlap_friends.clear()
-#                drone_list[combinations[i][1]].overlap_friends.clear()
+            # else:
+            #     drone_list[combinations[i][0]].overlap_count = 0
+            #     drone_list[combinations[i][1]].overlap_count = 0
+            #     drone_list[combinations[i][0]].overlap_friends.clear()
+            #     drone_list[combinations[i][1]].overlap_friends.clear()
 
-#for n in range(len(drone_list)):
-#    print(n, drone_list[n].t0, drone_list[n].t1, drone_list[n].overlap_count, drone_list[n].overlap_friends)
+# for n in range(len(drone_list)):
+#     print(n, drone_list[n].t0, drone_list[n].t1, drone_list[n].overlap_count, drone_list[n].overlap_friends)
 
 for i in range(len(layer21_combinations)):
     if layer21_list[layer21_combinations[i][0]].check_intersect(layer21_list[layer21_combinations[i][1]]) == True:
-        
         crit = layer21_list[layer21_combinations[i][0]].get_intersect(layer21_list[layer21_combinations[i][1]])
-        
         layer21_list[layer21_combinations[i][0]].t_min = min(layer21_list[layer21_combinations[i][0]].t_crit, layer21_list[layer21_combinations[i][0]].t_crit)
-        layer21_list[layer21_combinations[i][0]].t_max = max(layer21_list[layer21_combinations[i][0]].t_crit, layer21_list[layer21_combinations[i][0]].t_crit)
-          
+        layer21_list[layer21_combinations[i][0]].t_max = max(layer21_list[layer21_combinations[i][0]].t_crit, layer21_list[layer21_combinations[i][0]].t_crit)  
         prev_rel = 100000000
-        for t in range(int(layer21_list[layer21_combinations[i][0]].t_min - 60), int(layer21_list[layer21_combinations[i][0]].t_max + 60), 1):
 
+        for t in range(int(layer21_list[layer21_combinations[i][0]].t_min - 60), int(layer21_list[layer21_combinations[i][0]].t_max + 60), 1):
             rel = layer21_list[layer21_combinations[i][0]].rel_dist(layer21_list[layer21_combinations[i][1]], t)
-            
             if rel[2] > prev_rel:
                 break
             prev_rel = rel[2]
@@ -348,9 +310,7 @@ for i in range(len(layer21_combinations)):
 
 for i in range(len(layer22_combinations)):
     if layer22_list[layer22_combinations[i][0]].check_intersect(layer22_list[layer22_combinations[i][1]]) == True:
-        
         crit = layer22_list[layer22_combinations[i][0]].get_intersect(layer22_list[layer22_combinations[i][1]])
-        
         layer22_list[layer22_combinations[i][0]].t_min = min(layer22_list[layer22_combinations[i][0]].t_crit, layer22_list[layer22_combinations[i][0]].t_crit)
         layer22_list[layer22_combinations[i][0]].t_max = max(layer22_list[layer22_combinations[i][0]].t_crit, layer22_list[layer22_combinations[i][0]].t_crit)
         
