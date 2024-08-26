@@ -41,13 +41,11 @@ Data for average number of conflicts per operation in Figure 1(a) was plotted ag
 </br>
 *Applying the 1% cut-off point*</br>
 By observing the distribution of operations among the layers, it was found that some layers were occupied by a small number of operations, resulting in an excessive use of layers, as shown by the red circles in Figure 2(a). In the case of federated UTM architecture, the idea of a shared layer to combine all layers with number of operations less than a 1% cut-off percentage of the total number of operations in each service provider was proposed. The distribution after applying the 1% cut-off point is shown in Figure 2(b), and the number of layers needed were found to be reduced, as shown by the red arrow.</br>
-![image](https://github.com/lattecatte/DroneGreedyColoring/assets/154484150/91cbbf70-8cef-40d5-8fc1-9a4112600c4f)![image](https://github.com/lattecatte/DroneGreedyColoring/assets/154484150/bd36f189-4395-4574-aae2-d8d834fdb0c6)</br>
-![image](https://github.com/user-attachments/assets/be296c8f-1ae4-4afe-b623-1588c6d86b09)</br>
+![image](https://github.com/user-attachments/assets/6b553467-0da5-4e74-b10e-daa42d2505b1)
 ###### **Figure 2**, Left: (a) Distribution of operations among layers as a function of n (R = 300 m)</br>
 ###### Right: (b) Distribution of operations among layers as a function of n (R = 300 m), adjusted to the 1% cut-off point</br>
 The 1% cut-off point was applied to all simulations and the reduction of number of layers needed can be seen in Figure 3. In Figure 3(b), observations that were made were: a change in concentration of the operations, and the increase in effectiveness of the cut-off point as the number of UTMSPs increases, as shown by the red arrow.</br>
-![image](https://github.com/lattecatte/DroneGreedyColoring/assets/154484150/31f32beb-608b-439b-9f99-66deb7188b56)![image](https://github.com/lattecatte/DroneGreedyColoring/assets/154484150/955463e8-175e-4f46-8128-4c13a5beeb2f)</br>
-![image](https://github.com/user-attachments/assets/47f8a8bf-d02f-4a82-aef3-4ac2d6089d02)</br>
+![image](https://github.com/user-attachments/assets/e304b5f1-6b7a-41e0-9b25-39ff52666547)
 ###### **Figure 3**, (a) Average number of conflicts per operation and number of layers needed,</br>
 ###### (b) Average number of conflicts per operation and number of layers needed, adjusted to 1% cut-off point</br>
 For the range of the independent variables used, because the number of layers needed for all 60 simulations remained within the acceptable 20 layers for low-level uncontrolled airspace, the tradeoff could favor the federated UTM architecture’s more UTMSPs because the benefits of lower traffic caused by a lower average number of conflicts per operation could outweigh the extra number of layers needed. Furthermore, it was shown that the federated UTM architecture could additionally benefit from the 1% cut-off point.</br>
